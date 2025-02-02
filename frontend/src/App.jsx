@@ -2,7 +2,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
-import PublicFAQs from "./pages/PublicFAQs";
 import FAQFormPage from "./pages/FAQFormPage";
 import AdminPanel from "./pages/AdminPanel";
 import Login from "./pages/Login";
@@ -16,7 +15,7 @@ export default function App() {
                     <Navbar />
                     <main className="flex-grow">
                         <Routes>
-                            <Route path="/" element={<PublicFAQs />} />
+                            <Route path="/" element={<Login />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
                             <Route path="/admin" element={<AdminPanel />} />
