@@ -7,16 +7,21 @@ const signToken = (id) => {
     });
 };
 
+export const getMe = async (req, res) => {
+    try {
+        // Assuming you're using JWT middleware that sets req.user
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 export const signup = async (req, res) => {
     try {
         const { email, password, role } = req.body;
-
-        // Prevent self-assigning admin role
-        if (role === "admin") {
-            return res.status(403).json({
-                message: "Admin creation not allowed here",
-            });
-        }
 
         const newUser = await User.create({
             email,

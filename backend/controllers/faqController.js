@@ -11,31 +11,44 @@ const clearFAQCache = async () => {
         console.error("Cache clear error:", err);
     }
 };
-
-// Get FAQs with caching
+// controllers/faqController.js
 export const getFAQs = async (req, res) => {
     const lang = req.query.lang || "en";
     const cacheKey = `faqs:${lang}`;
 
     try {
-        // Cache check
+        // Check cache first
         const cachedData = await redisClient.get(cacheKey);
-        if (cachedData) return res.json(JSON.parse(cachedData));
+        if (cachedData) {
+            return res.json(JSON.parse(cachedData));
+        }
 
-        // Database query (lean bcz we don't need to modify the data)
-        const faqs = await FAQ.find().lean();
+        // Fetch raw FAQs from database
+        const rawFAQs = await FAQ.find().lean();
 
-        // Process translations
-        const processedFAQs = faqs.map((faq) => ({
-            question: faq.question[lang] || faq.question.en,
-            answer: faq.answer[lang] || faq.answer.en,
+        // Structure data with translations while maintaining original format
+        const processedFAQs = rawFAQs.map((faq) => ({
+            _id: faq._id,
+            question: {
+                en: faq.question.en,
+                hi: faq.question.hi || faq.question.en,
+                bn: faq.question.bn || faq.question.en,
+            },
+            answer: {
+                en: faq.answer.en,
+                hi: faq.answer.hi || faq.answer.en,
+                bn: faq.answer.bn || faq.answer.en,
+            },
+            createdAt: faq.createdAt,
+            updatedAt: faq.updatedAt,
         }));
 
-        // Set cache with 1-hour expiration
+        // Cache processed data
         await redisClient.setEx(cacheKey, 3600, JSON.stringify(processedFAQs));
 
         res.json(processedFAQs);
     } catch (error) {
+        console.error("Error fetching FAQs:", error);
         res.status(500).json({ error: "Server error" });
     }
 };
