@@ -1,5 +1,7 @@
 # BharatFD 🌐
 
+## Demo: https://tinyurl.com/BharatFD-Demo
+
 A multilingual FAQ management system with admin controls and public access portal. Built with MERN stack (MongoDB, Express, React, Node.js) and Redis caching.
 
 ## Table of Contents
