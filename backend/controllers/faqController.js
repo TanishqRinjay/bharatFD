@@ -4,8 +4,12 @@ import { translateText } from "../services/translate.js";
 
 // Cache invalidation helper
 const clearFAQCache = async () => {
-    const keys = await redisClient.keys("faqs:*");
-    if (keys.length > 0) await redisClient.del(keys);
+    try {
+        const keys = await redisClient.keys("faqs:*");
+        if (keys.length) await redisClient.del(keys);
+    } catch (err) {
+        console.error("Cache clear error:", err);
+    }
 };
 
 // Get FAQs with caching
@@ -67,5 +71,49 @@ export const createFAQ = async (req, res) => {
         res.status(201).json(newFAQ);
     } catch (error) {
         res.status(400).json({ error: "Invalid FAQ data" });
+    }
+};
+
+export const updateFAQ = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        const flattenObject = (obj, prefix = "") => {
+            return Object.keys(obj).reduce((acc, key) => {
+                const prefixedKey = prefix ? `${prefix}.${key}` : key;
+                if (typeof obj[key] === "object" && obj[key] !== null) {
+                    Object.assign(acc, flattenObject(obj[key], prefixedKey));
+                } else {
+                    acc[prefixedKey] = obj[key];
+                }
+                return acc;
+            }, {});
+        };
+
+        const faq = await FAQ.findByIdAndUpdate(
+            id,
+            { $set: flattenObject(updateData) },
+            { new: true, runValidators: true }
+        );
+
+        if (!faq) return res.status(404).json({ error: "FAQ not found" });
+
+        await clearFAQCache();
+        res.json(faq);
+    } catch (error) {
+        res.status(400).json({ error: "Invalid update data" });
+    }
+};
+
+export const deleteFAQ = async (req, res) => {
+    try {
+        const faq = await FAQ.findByIdAndDelete(req.params.id);
+        if (!faq) return res.status(404).json({ error: "FAQ not found" });
+
+        await clearFAQCache();
+        res.status(204).json({ message: "FAQ deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
     }
 };
