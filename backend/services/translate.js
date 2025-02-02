@@ -10,6 +10,6 @@ export const translateText = async (text, targetLang) => {
         return response.data.responseData.translatedText || text;
     } catch (error) {
         console.error("Translation failed:", error);
-        return text; // Fallback to original
+        return text;
     }
 };

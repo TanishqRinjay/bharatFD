@@ -18,7 +18,7 @@ export const getFAQs = async (req, res) => {
         const cachedData = await redisClient.get(cacheKey);
         if (cachedData) return res.json(JSON.parse(cachedData));
 
-        // Database query
+        // Database query (lean bcz we don't need to modify the data)
         const faqs = await FAQ.find().lean();
 
         // Process translations
@@ -35,13 +35,10 @@ export const getFAQs = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
-
-// Create FAQ with auto-translation
 export const createFAQ = async (req, res) => {
     const { question_en, answer_en } = req.body;
 
     try {
-        // Parallel translations
         const [question_hi, question_bn, answer_hi, answer_bn] =
             await Promise.all([
                 translateText(question_en, "hi"),
@@ -64,7 +61,7 @@ export const createFAQ = async (req, res) => {
             },
         });
 
-        // Clear all cached FAQs
+        // Clear all cached FAQs (We're clearing all cache when we creates new FAQs)
         await clearFAQCache();
 
         res.status(201).json(newFAQ);
