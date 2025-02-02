@@ -60,13 +60,11 @@ export default function Login() {
                             />
                         </div>
                     </div>
-
                     {error && (
                         <p className="text-red-600 text-sm text-center">
                             {error}
                         </p>
                     )}
-
                     <button
                         type="submit"
                         className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -83,6 +81,16 @@ export default function Login() {
                         Register here
                     </Link>
                 </p>
+                <div className="flex justify-center flex-col items-center text-sm text-gray-600">
+                    <p>
+                        <span className="text-black">Admin email: </span>
+                        admin@example.com
+                    </p>
+                    <p>
+                        <span className="text-black">Admin Password: </span>
+                        admin@123
+                    </p>
+                </div>
             </div>
         </div>
     );

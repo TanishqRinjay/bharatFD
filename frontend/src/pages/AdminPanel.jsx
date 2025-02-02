@@ -47,9 +47,9 @@ export default function AdminPanel() {
                         <LanguageSwitcher lang={lang} setLang={setLang} />
                         <Link
                             to="/admin/new"
-                            className="bg-blue-600 text-[#fff] px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                            className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                         >
-                            Create New FAQ
+                            <span className="text-white">Create New FAQ</span>
                         </Link>
                     </div>
                 </div>
